@@ -50,6 +50,16 @@ public interface Tokenizer {
     }
 
     /**
+     * Tokenize a text.
+     *
+     * This method tokenizes a input text as a sentence.
+     *
+     * @param text input text
+     * @return  results of tokenizing with three modes (= A, B and C mode)
+     */
+    public List<List<Morpheme>> tokenizeABC(String text);
+
+    /**
      * Prints a lattice structure of analyzing.
      *
      * @param output an output of printing
@@ -68,5 +78,8 @@ public interface Tokenizer {
 
         /** long mode */
         C,
+
+        /** all mode */
+        ABC,
     }
 }

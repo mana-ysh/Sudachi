@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.List;
+
 
 /**
  * A command-line morphological analysis tool.
@@ -40,29 +42,47 @@ public class SudachiCommandLine {
                 if (line == null) {
                     break;
                 }
-                for (Morpheme m : tokenizer.tokenize(mode, line)) {
-                    output.print(m.surface());
-                    output.print("\t");
-                    output.print(String.join(",", m.partOfSpeech()));
-                    output.print("\t");
-                    output.print(m.normalizedForm());
-                    if (printAll) {
-                        output.print("\t");
-                        output.print(m.dictionaryForm());
-                        output.print("\t");
-                        output.print(m.readingForm());
-                        output.print("\t");
-                        output.print(m.getDictionaryId());
-                        if (m.isOOV()) {
-                            output.print("\t");
-                            output.print("(OOV)");
-                        }
-                    }
-                    output.println();
+
+                switch (mode){
+                    case ABC:
+                        printAllMode(tokenizer.tokenizeABC(line), output, printAll);
+                        break;
+                    default:
+                        printSingleMode(tokenizer.tokenize(mode, line), output, printAll);
+                        break;
                 }
-                output.println("EOS");
             }
         }
+    }
+
+    private static void printSingleMode(List<Morpheme> morphemeList,
+                                        PrintStream output, boolean printAll) throws IOException{
+        for (Morpheme m : morphemeList) {
+            output.print(m.surface());
+            output.print("\t");
+            output.print(String.join(",", m.partOfSpeech()));
+            output.print("\t");
+            output.print(m.normalizedForm());
+            if (printAll) {
+                output.print("\t");
+                output.print(m.dictionaryForm());
+                output.print("\t");
+                output.print(m.readingForm());
+                output.print("\t");
+                output.print(m.getDictionaryId());
+                if (m.isOOV()) {
+                    output.print("\t");
+                    output.print("(OOV)");
+                }
+            }
+            output.println();
+        }
+        output.println("EOS");
+    }
+
+    private static void printAllMode(List<List<Morpheme>> morphemeABCList,
+                              PrintStream output, boolean printAl) throws IOException{
+        throw new IOException("not implemented yet");
     }
 
     /**
@@ -109,6 +129,11 @@ public class SudachiCommandLine {
                 case "B":
                     mode = Tokenizer.SplitMode.B;
                     break;
+
+                case "ABC":
+                    mode = Tokenizer.SplitMode.ABC;
+                    break;
+
                 default:
                     mode = Tokenizer.SplitMode.C;
                     break;
@@ -120,7 +145,7 @@ public class SudachiCommandLine {
             } else if (args[i].equals("-d")) {
                 isEnableDump = true;
             } else if (args[i].equals("-h")) {
-                System.err.println("usage: SudachiCommandLine [-r file] [-m A|B|C] [-o file] [-d] [file ...]");
+                System.err.println("usage: SudachiCommandLine [-r file] [-m A|B|C|ABC] [-o file] [-d] [file ...]");
                 System.err.println("\t-r file\tread settings from file");
                 System.err.println("\t-m mode\tmode of splitting");
                 System.err.println("\t-o file\toutput to file");
